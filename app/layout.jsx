@@ -1,5 +1,7 @@
 import { Plus_Jakarta_Sans, Space_Grotesk } from 'next/font/google'
 import './globals.css'
+import ToastProvider from '../components/ui/toast-provider'
+import ThemeToggle from '../components/ui/theme-toggle'
 
 const bodyFont = Plus_Jakarta_Sans({
   subsets: ['latin'],
@@ -20,7 +22,9 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body className={`${bodyFont.variable} ${headingFont.variable}`}>
+        <ThemeToggle />
         {children}
+        <ToastProvider />
       </body>
     </html>
   )
