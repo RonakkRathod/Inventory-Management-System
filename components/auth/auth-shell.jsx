@@ -47,7 +47,7 @@ function Field({ field }) {
     <div className="field">
       <label htmlFor={field.name}>{field.label}</label>
       <div className="input-shell">
-        <Icon size={18} strokeWidth={2} color="#5f6b76" />
+        <Icon size={18} strokeWidth={2} className="field-icon" />
         <input
           id={field.name}
           name={field.name}
@@ -193,7 +193,7 @@ export default function AuthShell({ page }) {
         <section className="auth-panel">
           <div className="auth-card">
             <div className="panel-intro">
-              <span className="eyebrow" style={{ color: '#0f766e', background: 'rgba(15, 118, 110, 0.08)', borderColor: 'rgba(15, 118, 110, 0.12)' }}>
+              <span className="eyebrow status-banner__icon" style={{ background: 'var(--primary-soft)', borderColor: 'rgba(37, 99, 235, 0.12)' }}>
                 <BadgeCheck size={14} />
                 {page.panelEyebrow}
               </span>
@@ -219,7 +219,7 @@ export default function AuthShell({ page }) {
 
             {page.status ? (
               <div className="status-banner">
-                <KeyRound size={18} color="#0f766e" />
+                <KeyRound size={18} className="status-banner__icon" />
                 <div>
                   <strong>{page.status.title}</strong>
                   <p>{page.status.text}</p>
@@ -266,7 +266,7 @@ export default function AuthShell({ page }) {
                   <ul className="security-list">
                     {page.securityTips.map((tip) => (
                       <li key={tip.title}>
-                        <CheckCircle2 size={18} color="#1d8348" />
+                        <CheckCircle2 size={18} className="security-icon" />
                         <div>
                           <strong>{tip.title}</strong>
                           <span>{tip.text}</span>
@@ -295,7 +295,7 @@ export default function AuthShell({ page }) {
 
             {page.success ? (
               <div className="success-block">
-                <CheckCircle2 size={22} color="#1d8348" />
+                <CheckCircle2 size={22} className="success-icon" />
                 <div>
                   <strong>{page.success.title}</strong>
                   <p>{page.success.text}</p>
