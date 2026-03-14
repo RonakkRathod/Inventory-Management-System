@@ -1,7 +1,6 @@
-import { Globe2, Palette, SlidersHorizontal } from 'lucide-react'
 import ProfileShell from './profile-shell'
 
-const page = {
+export const profilePreferencesPageData = {
   path: '/profile/preferences',
   title: 'Workspace preferences',
   description:
@@ -22,12 +21,12 @@ const page = {
     'Adjust table density based on your screen size and role workflow.',
   ],
   cards: [
-    { label: 'Theme profile', value: 'Core light', hint: 'Matches system theme tokens', icon: Palette },
-    { label: 'Locale', value: 'en-IN', hint: 'IST time + INR formatting', icon: Globe2 },
-    { label: 'Automation rules', value: '4 active', hint: 'For receipts and delivery alerts', icon: SlidersHorizontal },
+    { label: 'Theme profile', value: 'Core light', hint: 'Matches system theme tokens', icon: 'palette' },
+    { label: 'Locale', value: 'en-IN', hint: 'IST time + INR formatting', icon: 'globe' },
+    { label: 'Automation rules', value: '4 active', hint: 'For receipts and delivery alerts', icon: 'sliders' },
   ],
 }
 
-export default function ProfilePreferencesPage() {
-  return <ProfileShell page={page} />
+export default function ProfilePreferencesPage({ pageData = profilePreferencesPageData }) {
+  return <ProfileShell page={pageData} />
 }

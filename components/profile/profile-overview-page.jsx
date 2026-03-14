@@ -1,7 +1,6 @@
-import { Bell, ShieldCheck, UserRound } from 'lucide-react'
 import ProfileShell from './profile-shell'
 
-const page = {
+export const profileOverviewPageData = {
   path: '/profile',
   title: 'Profile overview',
   description:
@@ -22,12 +21,12 @@ const page = {
     'Review profile details before requesting additional role permissions.',
   ],
   cards: [
-    { label: 'Profile completion', value: '92%', hint: '1 optional field remaining', icon: UserRound },
-    { label: 'Last sign in', value: '2h ago', hint: 'from Mumbai, IN', icon: ShieldCheck },
-    { label: 'Unread alerts', value: '3', hint: 'security and operations notices', icon: Bell },
+    { label: 'Profile completion', value: '92%', hint: '1 optional field remaining', icon: 'user' },
+    { label: 'Last sign in', value: '2h ago', hint: 'from Mumbai, IN', icon: 'shield' },
+    { label: 'Unread alerts', value: '3', hint: 'security and operations notices', icon: 'bell' },
   ],
 }
 
-export default function ProfileOverviewPage() {
-  return <ProfileShell page={page} />
+export default function ProfileOverviewPage({ pageData = profileOverviewPageData }) {
+  return <ProfileShell page={pageData} />
 }
