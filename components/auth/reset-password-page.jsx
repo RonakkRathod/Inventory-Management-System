@@ -1,6 +1,6 @@
 import AuthShell from './auth-shell'
 
-const page = {
+export const resetPasswordPageData = {
   path: '/reset-password',
   heroTitle: 'Reset credentials with clear guidance and stronger password hygiene built in.',
   heroText:
@@ -27,6 +27,6 @@ const page = {
   footerLink: { href: '/login', label: 'Return to sign in' },
 }
 
-export default function ResetPasswordAuthPage() {
-  return <AuthShell page={page} />
+export default function ResetPasswordAuthPage({ pageData = resetPasswordPageData }) {
+  return <AuthShell page={pageData} />
 }

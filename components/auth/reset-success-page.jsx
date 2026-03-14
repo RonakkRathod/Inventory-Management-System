@@ -1,6 +1,6 @@
 import AuthShell from './auth-shell'
 
-const page = {
+export const resetSuccessPageData = {
   path: '/reset-success',
   heroTitle: 'Bring users back into the product with a confident success state and direct next step.',
   heroText:
@@ -28,6 +28,6 @@ const page = {
   accentAction: true,
 }
 
-export default function ResetSuccessAuthPage() {
-  return <AuthShell page={page} />
+export default function ResetSuccessAuthPage({ pageData = resetSuccessPageData }) {
+  return <AuthShell page={pageData} />
 }
