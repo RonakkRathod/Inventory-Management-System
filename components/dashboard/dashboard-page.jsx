@@ -12,38 +12,73 @@ import {
   Warehouse,
 } from 'lucide-react'
 
-const overviewCards = [
+const overviewCardIconMap = {
+  teal: Boxes,
+  orange: Truck,
+  slate: FileBox,
+  green: PackageCheck,
+}
+
+function getFlowStepHref(flowTitle, step, index) {
+  if (flowTitle === 'Receipts') {
+    if (index === 0) return '/operations#operation-list'
+    if (index === 1) return '/operations?op=receipt#operation-create'
+    return '/operations#recent-operations'
+  }
+
+  if (flowTitle === 'Internal Transfers') {
+    if (index === 0) return '/operations#operation-list'
+    if (index === 1) return '/operations?op=transfer#operation-create'
+    return '/operations#recent-operations'
+  }
+
+  if (flowTitle === 'Move History') {
+    return '/operations?op=history#recent-operations'
+  }
+
+  if (flowTitle === 'Inventory Adjustments') {
+    if (index === 0) return '/operations#operation-list'
+    if (index === 1) return '/operations?op=adjustment#operation-create'
+    return '/operations#recent-operations'
+  }
+
+  if (flowTitle === 'Delivery Orders') {
+    if (index === 0) return '/operations#operation-list'
+    if (index === 1) return '/operations?op=delivery#operation-create'
+    return '/operations#recent-operations'
+  }
+
+  return '/operations'
+}
+
+export const dashboardPageData = {
+  overviewCards: [
   {
     title: 'Active SKUs',
     value: '14,280',
     delta: '+4.3% this week',
-    icon: Boxes,
     tone: 'teal',
   },
   {
     title: 'Open Delivery Orders',
     value: '86',
     delta: '12 high priority',
-    icon: Truck,
     tone: 'orange',
   },
   {
     title: 'Pending Receipts',
     value: '42',
     delta: '8 arriving today',
-    icon: FileBox,
     tone: 'slate',
   },
   {
     title: 'Cycle Count Accuracy',
     value: '99.1%',
     delta: 'Across 5 warehouses',
-    icon: PackageCheck,
     tone: 'green',
   },
-]
-
-const operationFlows = [
+  ],
+  operationFlows: [
   {
     title: 'Receipts',
     color: 'pink',
@@ -69,16 +104,14 @@ const operationFlows = [
     color: 'amber',
     steps: ['Delivery List', 'Create Delivery Order', 'Delivery Details'],
   },
-]
-
-const recentEvents = [
+  ],
+  recentEvents: [
   'Receipt RC-9821 posted by Rahul (Mumbai WH).',
   'Internal transfer IT-443 moved 120 units to Pune hub.',
   'Stock adjustment ADJ-1501 approved by supervisor.',
   'Delivery order DO-7742 packed and ready to dispatch.',
-]
-
-const authRoutes = [
+  ],
+  authRoutes: [
   { href: '/products', label: 'Products list' },
   { href: '/products/create', label: 'Create product' },
   { href: '/products/details', label: 'Product details' },
@@ -91,9 +124,10 @@ const authRoutes = [
   { href: '/verify-code', label: 'Verify code' },
   { href: '/reset-password', label: 'Reset password' },
   { href: '/reset-success', label: 'Reset success' },
-]
+  ],
+}
 
-export default function DashboardPage() {
+export default function DashboardPage({ data = dashboardPageData }) {
   return (
     <main className="dashboard-page">
       <section className="dashboard-shell">
@@ -114,10 +148,10 @@ export default function DashboardPage() {
               <RefreshCcw size={16} />
               Sync now
             </button>
-            <button type="button" className="dashboard-btn dashboard-btn--primary">
+            <Link href="/operations" className="dashboard-btn dashboard-btn--primary">
               <ClipboardList size={16} />
               Create operation
-            </button>
+            </Link>
             <Link href="/login" className="dashboard-btn dashboard-btn--danger">
               <LogOut size={16} />
               Logout
@@ -126,8 +160,8 @@ export default function DashboardPage() {
         </header>
 
         <section className="dashboard-grid">
-          {overviewCards.map((card) => {
-            const Icon = card.icon
+          {data.overviewCards.map((card) => {
+            const Icon = typeof card.icon === 'function' ? card.icon : overviewCardIconMap[card.tone] ?? Boxes
             return (
               <article key={card.title} className={`overview-card overview-card--${card.tone}`}>
                 <div className="overview-card__head">
@@ -149,13 +183,15 @@ export default function DashboardPage() {
             </div>
 
             <div className="flow-stack">
-              {operationFlows.map((flow) => (
+              {data.operationFlows.map((flow) => (
                 <div key={flow.title} className="flow-row">
                   <span className={`flow-badge flow-badge--${flow.color}`}>{flow.title}</span>
                   <div className="flow-steps">
                     {flow.steps.map((step, index) => (
                       <div key={step} className="flow-step-wrap">
-                        <div className="flow-step">{step}</div>
+                        <Link href={getFlowStepHref(flow.title, step, index)} className="flow-step">
+                          {step}
+                        </Link>
                         {index < flow.steps.length - 1 ? <ArrowRight size={16} /> : null}
                       </div>
                     ))}
@@ -171,7 +207,7 @@ export default function DashboardPage() {
               <p>Jump directly into every existing auth route in this project.</p>
             </div>
             <div className="route-pills">
-              {authRoutes.map((route) => (
+              {data.authRoutes.map((route) => (
                 <Link key={route.href} href={route.href} className="route-pill">
                   {route.label}
                 </Link>
@@ -192,7 +228,7 @@ export default function DashboardPage() {
               <p>Last synced events from receipts, transfers, and dispatch operations.</p>
             </div>
             <ul className="activity-list">
-              {recentEvents.map((event) => (
+              {data.recentEvents.map((event) => (
                 <li key={event}>{event}</li>
               ))}
             </ul>
