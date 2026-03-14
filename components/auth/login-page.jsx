@@ -1,6 +1,6 @@
 import AuthShell from './auth-shell'
 
-const page = {
+export const loginPageData = {
   path: '/login',
   heroTitle: 'Access warehouse, sales, and stock intelligence from one secure gate.',
   heroText:
@@ -11,7 +11,7 @@ const page = {
   panelEyebrow: 'Welcome back',
   title: 'Sign in to your workspace',
   description: 'Use your work email or SSO provider to continue into CoreInventory.',
-  showSocial: true,
+  showSocial: false,
   showForm: true,
   fields: [
     { name: 'email', label: 'Work email', type: 'email', placeholder: 'alex@coreinventory.com', icon: 'email' },
@@ -24,6 +24,6 @@ const page = {
   footerLink: { href: '/signup', label: 'Create an account' },
 }
 
-export default function LoginAuthPage() {
-  return <AuthShell page={page} />
+export default function LoginAuthPage({ pageData = loginPageData }) {
+  return <AuthShell page={pageData} />
 }

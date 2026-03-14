@@ -1,6 +1,6 @@
 import AuthShell from './auth-shell'
 
-const page = {
+export const forgotPasswordPageData = {
   path: '/forgot-password',
   heroTitle: 'Recover account access without sending your team through support tickets.',
   heroText:
@@ -25,6 +25,6 @@ const page = {
   footerLink: { href: '/verify-code', label: 'Verify with a one-time code' },
 }
 
-export default function ForgotPasswordAuthPage() {
-  return <AuthShell page={page} />
+export default function ForgotPasswordAuthPage({ pageData = forgotPasswordPageData }) {
+  return <AuthShell page={pageData} />
 }
