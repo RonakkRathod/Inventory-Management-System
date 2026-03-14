@@ -1,5 +1,8 @@
-import ResetSuccessAuthPage from '../../components/auth/reset-success-page'
+import ResetSuccessAuthPage, { resetSuccessPageData } from '../../components/auth/reset-success-page'
+import { fetchBackendResource } from '../../lib/backend-api'
 
-export default function ResetSuccessPage() {
-  return <ResetSuccessAuthPage />
+export default async function ResetSuccessPage() {
+  const pageData = await fetchBackendResource('/auth/reset-success', resetSuccessPageData)
+
+  return <ResetSuccessAuthPage pageData={pageData} />
 }
