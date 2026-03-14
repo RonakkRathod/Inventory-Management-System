@@ -1,7 +1,6 @@
-import { KeyRound, ShieldCheck, Smartphone } from 'lucide-react'
 import ProfileShell from './profile-shell'
 
-const page = {
+export const profileSecurityPageData = {
   path: '/profile/security',
   title: 'Security settings',
   description:
@@ -22,12 +21,12 @@ const page = {
     'Always verify unusual login alerts from unknown locations.',
   ],
   cards: [
-    { label: '2FA strength', value: 'Strong', hint: 'OTP required on unknown devices', icon: ShieldCheck },
-    { label: 'Reset policy', value: 'Compliant', hint: 'Policy CI-SEC-02', icon: KeyRound },
-    { label: 'Mobile authenticator', value: 'Connected', hint: 'Last synced today', icon: Smartphone },
+    { label: '2FA strength', value: 'Strong', hint: 'OTP required on unknown devices', icon: 'shield' },
+    { label: 'Reset policy', value: 'Compliant', hint: 'Policy CI-SEC-02', icon: 'key' },
+    { label: 'Mobile authenticator', value: 'Connected', hint: 'Last synced today', icon: 'device' },
   ],
 }
 
-export default function ProfileSecurityPage() {
-  return <ProfileShell page={page} />
+export default function ProfileSecurityPage({ pageData = profileSecurityPageData }) {
+  return <ProfileShell page={pageData} />
 }
