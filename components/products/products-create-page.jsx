@@ -1,6 +1,6 @@
 import ProductsShell from './products-shell'
 
-const page = {
+export const productsCreatePageData = {
   path: '/products/create',
   title: 'Create product',
   description:
@@ -21,6 +21,6 @@ const page = {
   ],
 }
 
-export default function ProductsCreatePage() {
-  return <ProductsShell page={page} />
+export default function ProductsCreatePage({ pageData = productsCreatePageData }) {
+  return <ProductsShell page={pageData} />
 }
