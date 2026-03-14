@@ -1,6 +1,6 @@
 import AuthShell from './auth-shell'
 
-const page = {
+export const signupPageData = {
   path: '/signup',
   heroTitle: 'Launch a new inventory workspace with role-ready access from day one.',
   heroText:
@@ -11,7 +11,7 @@ const page = {
   panelEyebrow: 'Create account',
   title: 'Set up your access profile',
   description: 'Create a company account and invite the rest of your inventory team later.',
-  showSocial: true,
+  showSocial: false,
   showForm: true,
   fields: [
     { name: 'firstName', label: 'First name', type: 'text', placeholder: 'Aarav', icon: 'user' },
@@ -25,6 +25,6 @@ const page = {
   footerLink: { href: '/login', label: 'Sign in instead' },
 }
 
-export default function SignupAuthPage() {
-  return <AuthShell page={page} />
+export default function SignupAuthPage({ pageData = signupPageData }) {
+  return <AuthShell page={pageData} />
 }

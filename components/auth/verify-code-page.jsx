@@ -1,6 +1,6 @@
 import AuthShell from './auth-shell'
 
-const page = {
+export const verifyCodePageData = {
   path: '/verify-code',
   heroTitle: 'Confirm identity with a lightweight verification step designed for shared devices.',
   heroText:
@@ -23,6 +23,6 @@ const page = {
   footerLink: { href: '/verify-code', label: 'Resend code', accent: true },
 }
 
-export default function VerifyCodeAuthPage() {
-  return <AuthShell page={page} />
+export default function VerifyCodeAuthPage({ pageData = verifyCodePageData }) {
+  return <AuthShell page={pageData} />
 }
