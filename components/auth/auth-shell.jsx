@@ -1,13 +1,17 @@
 'use client'
 
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { useRef, useState } from 'react'
+import toast from 'react-hot-toast'
 import {
   ArrowRight,
   BadgeCheck,
   Building2,
   CheckCircle2,
   CircleDashed,
+  Eye,
+  EyeOff,
   KeyRound,
   LockKeyhole,
   Mail,
@@ -25,23 +29,28 @@ const iconMap = {
 }
 
 const pageLinks = [
-  ['/dashboard', 'Dashboard'],
-  ['/products', 'Products'],
-  ['/products/create', 'Create Product'],
-  ['/products/details', 'Product Details'],
-  ['/profile', 'Profile'],
-  ['/profile/security', 'Security'],
-  ['/profile/preferences', 'Preferences'],
-  ['/login', 'Sign in'],
-  ['/signup', 'Create account'],
-  ['/forgot-password', 'Recover'],
-  ['/verify-code', 'Verify'],
-  ['/reset-password', 'Reset'],
-  ['/reset-success', 'Success'],
+  { href: '/dashboard', label: 'Dashboard', disabled: true },
+  { href: '/products', label: 'Products', disabled: true },
+  { href: '/products/create', label: 'Create Product', disabled: true },
+  { href: '/products/details', label: 'Product Details', disabled: true },
+  { href: '/profile', label: 'Profile', disabled: true },
+  { href: '/profile/security', label: 'Security', disabled: true },
+  { href: '/profile/preferences', label: 'Preferences', disabled: true },
+  { href: '/login', label: 'Sign in' },
+  { href: '/signup', label: 'Create account' },
+  { href: '/forgot-password', label: 'Recover' },
+  { href: '/verify-code', label: 'Verify' },
+  { href: '/reset-password', label: 'Reset' },
+  { href: '/reset-success', label: 'Success' },
 ]
 
 function Field({ field }) {
   const Icon = iconMap[field.icon] ?? Mail
+  const isPasswordField = field.type === 'password'
+  const [showPassword, setShowPassword] = useState(false)
+
+  const inputType = isPasswordField && showPassword ? 'text' : field.type
+  const ToggleIcon = showPassword ? EyeOff : Eye
 
   return (
     <div className="field">
@@ -51,10 +60,20 @@ function Field({ field }) {
         <input
           id={field.name}
           name={field.name}
-          type={field.type}
+          type={inputType}
           placeholder={field.placeholder}
           defaultValue={field.defaultValue}
         />
+        {isPasswordField ? (
+          <button
+            type="button"
+            className="password-toggle"
+            aria-label={showPassword ? 'Hide password' : 'Show password'}
+            onClick={() => setShowPassword((prev) => !prev)}
+          >
+            <ToggleIcon size={18} strokeWidth={2} />
+          </button>
+        ) : null}
       </div>
     </div>
   )
@@ -127,10 +146,189 @@ function OtpInput({ length = 6 }) {
 }
 
 export default function AuthShell({ page }) {
+  const router = useRouter()
+  const isSignupPage = page.path === '/signup'
+  const hasRelaxedFooterSpacing = ['/signup', '/login', '/verify-code'].includes(page.path)
+  const hasRelaxedFooterCopy = ['/login', '/verify-code'].includes(page.path)
+  const [isSubmitting, setIsSubmitting] = useState(false)
+
+  const backendApiUrl = process.env.NEXT_PUBLIC_BACKEND_API_URL ?? 'http://127.0.0.1:4000/api'
+
+  const showToast = (message, type = 'success') => {
+    if (!message) return
+    if (type === 'error') {
+      toast.error(message)
+      return
+    }
+
+    toast.success(message)
+  }
+
+  const persistSession = (result) => {
+    if (result?.token) {
+      localStorage.setItem('coreinventory_token', result.token)
+    }
+
+    if (result?.user) {
+      localStorage.setItem('coreinventory_user', JSON.stringify(result.user))
+    }
+  }
+
+  const postRequest = async (path, payload, token) => {
+    const response = await fetch(`${backendApiUrl}${path}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      },
+      body: JSON.stringify(payload),
+    })
+
+    const data = await response.json().catch(() => ({}))
+
+    if (!response.ok) {
+      throw new Error(data.message || 'Request failed.')
+    }
+
+    return data
+  }
+
+  const handleAuthSubmit = async (event) => {
+    event.preventDefault()
+    setIsSubmitting(true)
+
+    const form = event.currentTarget
+    const formData = new FormData(form)
+
+    try {
+      if (page.path === '/signup') {
+        const result = await postRequest('/auth/signup', {
+          firstName: formData.get('firstName'),
+          lastName: formData.get('lastName'),
+          email: formData.get('email'),
+          password: formData.get('password'),
+        })
+
+        persistSession(result)
+        showToast('Account created successfully.', 'success')
+        setTimeout(() => router.push('/dashboard'), 450)
+        return
+      }
+
+      if (page.path === '/login') {
+        const result = await postRequest('/auth/login', {
+          email: formData.get('email'),
+          password: formData.get('password'),
+        })
+
+        persistSession(result)
+        showToast('Login successful.', 'success')
+        setTimeout(() => router.push('/dashboard'), 450)
+        return
+      }
+
+      if (page.path === '/forgot-password') {
+        const email = String(formData.get('email') || '').trim().toLowerCase()
+        const result = await postRequest('/auth/request-otp', { email, purpose: 'password_reset' })
+        sessionStorage.setItem('coreinventory_reset_email', email)
+        sessionStorage.setItem('coreinventory_otp_purpose', 'password_reset')
+        showToast(result.devOtp ? `OTP sent. Dev OTP: ${result.devOtp}` : 'OTP sent successfully.', 'success')
+        setTimeout(() => router.push('/verify-code'), 700)
+        return
+      }
+
+      if (page.path === '/verify-code') {
+        const email = sessionStorage.getItem('coreinventory_reset_email') || ''
+        const purpose = sessionStorage.getItem('coreinventory_otp_purpose') || 'password_reset'
+        if (!email) {
+          throw new Error('Recovery email not found. Start from forgot-password page again.')
+        }
+
+        const otp = Array.from(form.querySelectorAll('.otp-input'))
+          .map((input) => input.value)
+          .join('')
+
+        if (otp.length !== 6) {
+          throw new Error('Enter the complete 6-digit verification code.')
+        }
+
+        const result = await postRequest('/auth/verify-otp', { email, otp, purpose })
+
+        if (purpose === 'login' && result?.token) {
+          persistSession(result)
+          sessionStorage.removeItem('coreinventory_reset_email')
+          sessionStorage.removeItem('coreinventory_otp_purpose')
+          showToast('OTP correct. Logged in successfully.', 'success')
+          setTimeout(() => router.push('/dashboard'), 500)
+          return
+        }
+
+        showToast('OTP verified successfully.', 'success')
+        setTimeout(() => router.push('/reset-password'), 500)
+        return
+      }
+
+      if (page.path === '/reset-password') {
+        const email = sessionStorage.getItem('coreinventory_reset_email') || ''
+        if (!email) {
+          throw new Error('Recovery email not found. Start from forgot-password page again.')
+        }
+
+        const newPassword = String(formData.get('newPassword') || '')
+        const confirmPassword = String(formData.get('confirmPassword') || '')
+
+        if (newPassword !== confirmPassword) {
+          throw new Error('New password and confirm password must match.')
+        }
+
+        await postRequest('/auth/reset-password', { email, newPassword })
+        sessionStorage.removeItem('coreinventory_reset_email')
+        sessionStorage.removeItem('coreinventory_otp_purpose')
+        showToast('Password updated successfully.', 'success')
+        setTimeout(() => router.push('/reset-success'), 500)
+        return
+      }
+
+      showToast('Form submitted successfully.', 'success')
+    } catch (error) {
+      showToast(error.message || 'Something went wrong.', 'error')
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
+
+  const handleOtpLoginRequest = async () => {
+    setIsSubmitting(true)
+
+    try {
+      const emailInput = document.getElementById('email')
+      const email = String(emailInput?.value || '').trim().toLowerCase()
+
+      if (!email) {
+        throw new Error('Enter your email on login page before requesting OTP.')
+      }
+
+      const result = await postRequest('/auth/request-otp', { email, purpose: 'login' })
+      sessionStorage.setItem('coreinventory_reset_email', email)
+      sessionStorage.setItem('coreinventory_otp_purpose', 'login')
+
+      const successMessage = result.devOtp
+        ? `OTP sent. Dev OTP: ${result.devOtp}`
+        : 'OTP sent successfully. Check your email.'
+
+      showToast(successMessage, 'success')
+      router.push('/verify-code')
+    } catch (error) {
+      showToast(error.message || 'Unable to request OTP.', 'error')
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
+
   return (
     <main className="auth-page">
-      <section className="auth-shell">
-        <aside className="auth-hero">
+      <section className={`auth-shell${isSignupPage ? ' auth-shell--signup' : ''}`}>
+        <aside className={`auth-hero${isSignupPage ? ' auth-hero--signup' : ''}`}>
           <div className="brand-row">
             <div className="brand-mark">
               <span className="brand-mark__badge">
@@ -144,8 +342,8 @@ export default function AuthShell({ page }) {
             </span>
           </div>
 
-          <div className="auth-hero__content">
-            <div>
+          <div className={`auth-hero__content${isSignupPage ? ' auth-hero__content--signup' : ''}`}>
+            <div className={isSignupPage ? 'hero-copy hero-copy--signup' : 'hero-copy'}>
               <span className="eyebrow">
                 <ShieldCheck size={14} />
                 Secure workspace access
@@ -175,17 +373,25 @@ export default function AuthShell({ page }) {
             </article>
           </div>
 
-          <div className="hero-footer">
-            <div className={`page-links${page.path === '/login' ? ' page-links--login' : ''}`}>
-              {pageLinks.map(([href, label]) => (
-                <Link
-                  key={href}
-                  href={href}
-                  className={`page-pill${page.path === href ? ' page-pill--active' : ''}`}
-                >
-                  {label}
-                </Link>
-              ))}
+          <div className={`hero-footer${hasRelaxedFooterSpacing ? ' hero-footer--spacious' : ''}`}>
+            <div className={`page-links${page.path === '/login' ? ' page-links--login' : ''}${hasRelaxedFooterSpacing ? ' page-links--spacious' : ''}`}>
+              {pageLinks.map((item) => {
+                const className = `page-pill${page.path === item.href ? ' page-pill--active' : ''}${item.disabled ? ' page-pill--disabled' : ''}`
+
+                if (item.disabled) {
+                  return (
+                    <span key={item.href} className={className} aria-disabled="true" title="Available after sign in">
+                      {item.label}
+                    </span>
+                  )
+                }
+
+                return (
+                  <Link key={item.href} href={item.href} className={className}>
+                    {item.label}
+                  </Link>
+                )
+              })}
             </div>
           </div>
         </aside>
@@ -228,7 +434,7 @@ export default function AuthShell({ page }) {
             ) : null}
 
             {page.showForm ? (
-              <form className="auth-form">
+              <form className="auth-form" onSubmit={handleAuthSubmit}>
                 {page.fields?.length > 2 ? (
                   <div className="field-grid">
                     {page.fields.map((field) => (
@@ -278,17 +484,30 @@ export default function AuthShell({ page }) {
 
                 <button
                   type="submit"
+                  disabled={isSubmitting}
                   className={`primary-button${page.accentAction ? ' primary-button--accent' : ''}`}
                 >
-                  {page.primaryAction}
+                  {isSubmitting ? 'Please wait...' : page.primaryAction}
                   <ArrowRight size={18} />
                 </button>
 
                 {page.secondaryAction ? (
-                  <Link href={page.secondaryAction.href} className="secondary-button">
-                    {page.secondaryAction.label}
-                    <MoveRight size={18} />
-                  </Link>
+                  page.path === '/login' && page.secondaryAction.href === '/verify-code' ? (
+                    <button
+                      type="button"
+                      className="secondary-button"
+                      onClick={handleOtpLoginRequest}
+                      disabled={isSubmitting}
+                    >
+                      {isSubmitting ? 'Please wait...' : page.secondaryAction.label}
+                      <MoveRight size={18} />
+                    </button>
+                  ) : (
+                    <Link href={page.secondaryAction.href} className="secondary-button">
+                      {page.secondaryAction.label}
+                      <MoveRight size={18} />
+                    </Link>
+                  )
                 ) : null}
               </form>
             ) : null}
@@ -324,7 +543,7 @@ export default function AuthShell({ page }) {
               </div>
             ) : null}
 
-            <div className={`footer-copy${page.path === '/login' ? ' footer-copy--login' : ''}`}>
+            <div className={`footer-copy${hasRelaxedFooterCopy ? ' footer-copy--relaxed' : ''}`}>
               <span>{page.footerText}</span>
               {page.footerLink ? (
                 <Link href={page.footerLink.href} className={`inline-link${page.footerLink.accent ? ' text-link--accent' : ''}`}>
