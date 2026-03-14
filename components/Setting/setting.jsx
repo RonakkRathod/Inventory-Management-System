@@ -71,10 +71,10 @@ export default function SettingsPage() {
 const styles = {
   page: {
     minHeight: "100vh",
-    background: "#0f172a",
-    color: "white",
+    background: "#f8fafc",
+    color: "#0f172a",
     padding: "30px",
-    fontFamily: "Arial, sans-serif",
+    fontFamily: "inherit",
   },
   header: {
     display: "flex",
@@ -90,11 +90,11 @@ const styles = {
   },
   subText: {
     marginTop: "8px",
-    color: "#94a3b8",
+    color: "#475569",
   },
   primaryBtn: {
-    background: "#a78bfa",
-    color: "#0f172a",
+    background: "#2563eb",
+    color: "#ffffff",
     border: "none",
     padding: "12px 18px",
     borderRadius: "10px",
@@ -106,16 +106,17 @@ const styles = {
     alignItems: "center",
     gap: "20px",
     flexWrap: "wrap",
-    background: "#1e293b",
-    border: "1px solid rgba(255,255,255,0.08)",
+    background: "#ffffff",
+    border: "1px solid rgba(15,23,42,0.1)",
     borderRadius: "20px",
     padding: "25px",
     marginBottom: "30px",
+    boxShadow: "0 24px 60px rgba(15,23,42,0.08)",
   },
   startBox: {
     minWidth: "220px",
     minHeight: "90px",
-    background: "#4338ca",
+    background: "#dbeafe",
     borderRadius: "16px",
     display: "flex",
     alignItems: "center",
@@ -124,10 +125,11 @@ const styles = {
     padding: "20px",
     fontWeight: "700",
     fontSize: "18px",
+    color: "#1d4ed8",
   },
   mainArrow: {
     fontSize: "30px",
-    color: "#a78bfa",
+    color: "#2563eb",
     fontWeight: "bold",
   },
   centerSection: {
@@ -138,7 +140,7 @@ const styles = {
   },
   mainBox: {
     minHeight: "100px",
-    background: "#6366f1",
+    background: "#0f172a",
     borderRadius: "18px",
     display: "flex",
     alignItems: "center",
@@ -147,6 +149,7 @@ const styles = {
     padding: "20px",
     fontWeight: "700",
     fontSize: "20px",
+    color: "#ffffff",
   },
   actionsRow: {
     display: "grid",
@@ -154,7 +157,7 @@ const styles = {
     gap: "20px",
   },
   flowBlock: {
-    background: "#334155",
+    background: "#f8fafc",
     borderRadius: "16px",
     padding: "18px",
     display: "flex",
@@ -162,10 +165,11 @@ const styles = {
     justifyContent: "space-between",
     gap: "12px",
     flexWrap: "wrap",
+    border: "1px solid rgba(15,23,42,0.1)",
   },
   label: {
-    background: "#a78bfa",
-    color: "#0f172a",
+    background: "#dbeafe",
+    color: "#1d4ed8",
     padding: "8px 14px",
     borderRadius: "999px",
     fontWeight: "700",
@@ -173,13 +177,13 @@ const styles = {
   },
   arrow: {
     fontSize: "24px",
-    color: "#c4b5fd",
+    color: "#2563eb",
     fontWeight: "bold",
   },
   sideBox: {
     flex: 1,
     minHeight: "70px",
-    background: "#4f46e5",
+    background: "#ffffff",
     borderRadius: "14px",
     display: "flex",
     alignItems: "center",
@@ -187,6 +191,7 @@ const styles = {
     textAlign: "center",
     padding: "16px",
     fontWeight: "700",
+    border: "1px solid rgba(15,23,42,0.1)",
   },
   infoGrid: {
     display: "grid",
@@ -194,19 +199,20 @@ const styles = {
     gap: "20px",
   },
   infoCard: {
-    background: "#1e293b",
-    border: "1px solid rgba(255,255,255,0.08)",
+    background: "#ffffff",
+    border: "1px solid rgba(15,23,42,0.1)",
     borderRadius: "16px",
     padding: "20px",
+    boxShadow: "0 18px 40px rgba(15,23,42,0.06)",
   },
   cardTitle: {
     marginTop: 0,
     marginBottom: "10px",
-    color: "#c4b5fd",
+    color: "#2563eb",
   },
   cardText: {
     margin: 0,
-    color: "#cbd5e1",
+    color: "#475569",
     lineHeight: "1.6",
   },
 };
