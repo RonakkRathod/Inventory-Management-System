@@ -1,5 +1,8 @@
-import SignupAuthPage from '../../components/auth/signup-page'
+import SignupAuthPage, { signupPageData } from '../../components/auth/signup-page'
+import { fetchBackendResource } from '../../lib/backend-api'
 
-export default function SignupPage() {
-  return <SignupAuthPage />
+export default async function SignupPage() {
+  const pageData = await fetchBackendResource('/auth/signup', signupPageData)
+
+  return <SignupAuthPage pageData={pageData} />
 }
